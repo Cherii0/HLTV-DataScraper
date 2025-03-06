@@ -6,13 +6,13 @@
 In the world of esports, HLTV.org stands as the leading platform for tracking Counter-Strike competitive matches, player statistics, team rankings, and tournament results. With a wealth of structured data, HLTV offers a valuable resource for data enthusiasts looking to explore real-world datasets.
 
 # Objectives
-*Extract data
-*Clean and transform
-*Create relationships
-*Export for restoration
+* Extract data
+* Clean and transform
+* Create relationships
+* Export for restoration
 
 # Tools
-*Python pandas
-*Python webscrapper
-*SQL Server
-*TSQL
+* Python pandas
+* Python webscrapper
+* SQL Server
+* TSQL
