@@ -25,6 +25,6 @@ In the world of esports, HLTV.org stands as the leading platform for tracking Co
 
 # Relations
 
-<img width="440" alt="relations" src="relations.png">
+<img width="700" alt="relations" src="relations.png">
 
 The database includes six tables: matches, maps_stats, player_details, player_stats, teams and tournaments. The foreign key relationships are mostly one-to-many, such as one match having many maps stats, and one team having many players. These relationships can be visualized using dbdiagram.io
