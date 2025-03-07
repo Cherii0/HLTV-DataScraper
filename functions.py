@@ -78,7 +78,7 @@ def write_to_file(input , file_name, input_type = "listdict"):
         header += concat(key, ";")
 
     # encoding="utf-8" required for properly write file
-    with open("hltv.txt", "w", encoding="utf-8") as file:
+    with open(file_name, "w", encoding="utf-8") as file:
         file.write(concat(header, "\n"))
         for match in input:
             row = ""
