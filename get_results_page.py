@@ -73,7 +73,6 @@ def write_to_file(match_overview, file_name):
 
 
 def get_maps_scores(match_url):
-    
     '''  returns each maps scores for each team   '''
 
     content_overall = get_website_content(match_url, "div", "results played", "multi")
@@ -89,7 +88,37 @@ def get_maps_scores(match_url):
                 conetnt_teams[1].get_text(): conetnt_scores[1].get_text()
             }
         )
-    
+
     return result_set
 
+
+def get_players_played(match_url):
+
+    '''  gets player nick, kd, adr for each player played given match   '''
+
+    # gets table stats
+    content_overall = get_website_content(match_url, "div", "stats-content", "single")
+    # finds each player content
+    content_player = content_overall.find_all("tr", class_="")
+
+    # players team 1 - filters duplicates
+    content_player_t1 = content_player[:5]
+    # players team 2 - filters duplicates
+    content_player_t2 = content_player[15:20]
+    # merge both teams content
+    content_players = content_player_t1 + content_player_t2
+
+    result_set = []
+
+    for player in content_players:
+
+        player_nick = player.find("span", class_="player-nick").get_text()
+        player_kd = player.find("td", class_="kd text-center").get_text()
+        player_adr = player.find("td", class_="adr text-center").get_text()
+
+        result_set.append({
+            player_nick : [player_kd, player_adr]
+        })
+
+    return result_set
 
