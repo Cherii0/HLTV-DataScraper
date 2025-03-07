@@ -1,25 +1,37 @@
 from operator import concat
-
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
-import re
 
-driver = webdriver.Chrome(options=Options())
-url = "https://www.hltv.org/results"
-driver.get(url)
+def get_website_content(url, con_type, _class, find_type):
 
-# waits for page to fully load
-driver.implicitly_wait(2)
-page_content = driver.page_source
+    '''   from provided url scrapping all content  '''
 
-soup = BeautifulSoup(page_content, "html.parser")
-soup.prettify()
+    driver = webdriver.Chrome(options=Options())
+    driver.get(url)
 
-# holds content to scrap
-matches_content = soup.find_all("div", class_="result-con")
+    # waits for page to fully load
+    driver.implicitly_wait(2)
+    page_content = driver.page_source
+
+    # holds content to scrap
+    soup = BeautifulSoup(page_content, "html.parser")
+
+    if find_type == "multi":
+        content = soup.find_all(con_type, class_=_class)
+    elif find_type == "single":
+        content = soup.find(con_type, class_=_class)
+    else:
+        return soup
+
+    driver.quit()
+
+    return content
 
 def get_matches_links(matches_content):
+
+    '''  returns all matches links from given html content   '''
+
     matches_links = []
     for match in matches_content:
         full_link = concat("https://www.hltv.org", match.find("a", class_="a-reset").get("href"))
@@ -27,6 +39,9 @@ def get_matches_links(matches_content):
     return matches_links
 
 def get_match_overview(matches_content):
+
+    '''  returns list of dictionaries that holds basic match stats   '''
+
     matches_overview = []
     for match_no, match in enumerate(matches_content):
         score_won = match.find("span", class_="score-won").get_text()
@@ -57,6 +72,24 @@ def write_to_file(match_overview, file_name):
             file.write(concat(str(match), "\n"))
 
 
-write_to_file(get_match_overview(matches_content), "hltv.txt")
+def get_maps_scores(match_url):
+    
+    '''  returns each maps scores for each team   '''
 
-driver.quit()
+    content_overall = get_website_content(match_url, "div", "results played", "multi")
+    result_set = []
+
+    for no, content in enumerate(content_overall):
+        conetnt_scores = content.find_all("div", class_="results-team-score")
+        conetnt_teams = content.find_all("div", class_="results-teamname text-ellipsis")
+
+        result_set.append(
+            {
+                conetnt_teams[0].get_text(): conetnt_scores[0].get_text(),
+                conetnt_teams[1].get_text(): conetnt_scores[1].get_text()
+            }
+        )
+    
+    return result_set
+
+
