@@ -151,4 +151,50 @@ def get_players_played(match_url):
     return result_set
 
 
-# FINE match type bo3 bo1 #  match_type = get_website_content(url, "div","padding preformatted-text", "single").get_text()
+def get_match(url):
+
+    '''  pull all data needed for single row
+     in table matches from provided match    '''
+
+    content_overall = get_website_content(url, "None", "None", "None")
+
+    id = url.split("/")[4]
+    date = content_overall.find_all("div", class_ = "date")[1].get_text()
+    type = content_overall.find("div", class_ = "padding preformatted-text").get_text().split("*")[0]
+    tournament_id = content_overall.find("div", class_="event text-ellipsis").find("a").get("href").split("/")[2]
+
+    teamA_area = content_overall.find("div", class_ = "team1-gradient")
+    teamB_area = content_overall.find("div", class_ = "team2-gradient")
+
+    teamA_id = teamA_area.find("a").get("href").split("/")[2]
+    teamB_id = teamB_area.find("a").get("href").split("/")[2]
+
+    for type in ["won", "lost"]:
+        temp = teamA_area.find("div", class_=type)
+        if temp is None:
+            continue
+        else:
+            score_teamA = temp.get_text()
+
+    for type in ["won", "lost"]:
+        temp = teamB_area.find("div", class_=type)
+        if temp is None:
+            continue
+        else:
+            score_teamB = temp.get_text()
+
+
+    bans_area = content_overall.find_all("div", class_ = "standard-box veto-box")[1].find("div", class_="padding")
+    bans_both = [ban.get_text().split(".")[1].lstrip() for ban in bans_area.find_all("div")]
+    bans_teamA = []
+    bans_teamB = []
+
+    for no, ban in enumerate(bans_both):
+        if no % 2 == 0:
+            bans_teamB.append(ban)
+        else:
+            bans_teamA.append(ban)
+
+    bans_teamB.pop() # removes left map
+
+
