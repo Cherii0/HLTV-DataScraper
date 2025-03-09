@@ -1,12 +1,8 @@
 from funtions import *
 
-# init html content
-content = get_website_content("https://www.hltv.org/results","div", "result-con", "multi")
+history_results_pages = 2
+links = get_matches_links(history_results_pages)
 
-map_base_stats = get_match_overview(content)
-matches_links = get_matches_links(content)
-players_stats = get_players_played(matches_links[4])
-
-# both works fine
-write_to_file(map_base_stats, "map_base_stats.txt", "listdict")
-write_to_file(players_stats, "players_stats.txt", "listdict")
+for link in links:
+    match = get_match(link)
+    write_to_file(match, "matches.txt", "listdict")
