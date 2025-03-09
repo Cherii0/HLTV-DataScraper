@@ -79,7 +79,7 @@ def get_match_overview(content):
     return(matches_overview)
 
 
-def write_to_file(input , file_name):
+def write_to_file(input , file_name, input_type = "listdict"):
 
     '''  gets list of dictionaries and writes to csv file   '''
 
@@ -159,14 +159,23 @@ def get_players_played(match_url):
 def get_match(url):
 
     '''  pull all data needed for single row
-     in table matches for provided match    '''
+     in table matches from provided match    '''
 
     result = []
 
     content_overall = get_website_content(url, "None", "None", "None")
 
     id = url.split("/")[4]
-    date = content_overall.find_all("div", class_ = "date")[1].get_text()
+
+    try:
+        date = content_overall.find_all("div", class_="date")[1].get_text()
+    except IndexError:
+        date = None
+
+
+
+
+
     type_ = content_overall.find("div", class_ = "padding preformatted-text").get_text().split("*")[0]
     type_ = type_.replace("\n\n", "")
     tournament_id = content_overall.find("div", class_="event text-ellipsis").find("a").get("href").split("/")[2]
@@ -191,8 +200,11 @@ def get_match(url):
         else:
             score_teamB = temp.get_text()
 
+    try:
+        bans_area = content_overall.find_all("div", class_="standard-box veto-box")[1].find("div", class_="padding")
+    except IndexError:
+        bans_area = None
 
-    bans_area = content_overall.find_all("div", class_ = "standard-box veto-box")[1].find("div", class_="padding")
     bans_both = [ban.get_text().split(".")[1].lstrip() for ban in bans_area.find_all("div")]
     bans_teamA = []
     bans_teamB = []
