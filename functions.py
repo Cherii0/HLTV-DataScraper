@@ -28,15 +28,26 @@ def get_website_content(url, con_type, _class, find_type):
 
     return content
 
-def get_matches_links(content):
+def get_matches_links(pages):
 
-    '''  returns all matches links from given html content   '''
+    '''  returns all matches links from given number of history results pages  '''
 
     matches_links = []
-    for match in content:
-        full_link = concat("https://www.hltv.org", match.find("a", class_="a-reset").get("href"))
-        matches_links.append(full_link)
+
+    for page in range(pages+1):
+        if page == 1:
+            content = get_website_content("https://www.hltv.org/results", "div", "result-con", "multi")
+        else:
+            offset = 100 * page
+            content = get_website_content(concat("https://www.hltv.org/results?offset=", str(offset)), "div",
+                                          "result-con", "multi")
+
+        for match in content:
+            full_link = concat("https://www.hltv.org", match.find("a", class_="a-reset").get("href"))
+            matches_links.append(full_link)
+
     return matches_links
+
 
 def get_match_overview(content):
 
@@ -68,18 +79,12 @@ def get_match_overview(content):
     return(matches_overview)
 
 
-def write_to_file(input , file_name, input_type = "listdict"):
+def write_to_file(input , file_name):
 
     '''  gets list of dictionaries and writes to csv file   '''
 
-    keys = input[0].keys()
-    header = ""
-    for key in keys:
-        header += concat(key, ";")
-
     # encoding="utf-8" required for properly write file
-    with open(file_name, "w", encoding="utf-8") as file:
-        file.write(concat(header, "\n"))
+    with open(file_name, "a", encoding="utf-8") as file:
         for match in input:
             row = ""
             for elem in match.values():
@@ -154,13 +159,16 @@ def get_players_played(match_url):
 def get_match(url):
 
     '''  pull all data needed for single row
-     in table matches from provided match    '''
+     in table matches for provided match    '''
+
+    result = []
 
     content_overall = get_website_content(url, "None", "None", "None")
 
     id = url.split("/")[4]
     date = content_overall.find_all("div", class_ = "date")[1].get_text()
-    type = content_overall.find("div", class_ = "padding preformatted-text").get_text().split("*")[0]
+    type_ = content_overall.find("div", class_ = "padding preformatted-text").get_text().split("*")[0]
+    type_ = type_.replace("\n\n", "")
     tournament_id = content_overall.find("div", class_="event text-ellipsis").find("a").get("href").split("/")[2]
 
     teamA_area = content_overall.find("div", class_ = "team1-gradient")
@@ -197,4 +205,25 @@ def get_match(url):
 
     bans_teamB.pop() # removes left map
 
+    bans_teamB = ",".join([ban.split(" ")[-1] for ban in bans_teamB])
+    bans_teamA = ",".join([ban.split(" ")[-1] for ban in bans_teamA])
 
+    mvp = content_overall.find("div", class_ = "highlighted-player potm-container").find("span", class_="player-nick").get_text()
+
+    result.append(
+        {
+            "id" : id,
+            "date" : date,
+            "type" : type_,
+            "tournament_id" : tournament_id,
+            "teamA_id" : teamA_id,
+            "teamB_id" : teamB_id,
+            "score_teamA" : score_teamA,
+            "score_teamB" : score_teamB,
+            "bans_teamA" : bans_teamA,
+            "bans_teamB" : bans_teamB,
+            "mvp" : mvp
+        }
+    )
+
+    return result
