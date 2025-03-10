@@ -254,3 +254,82 @@ def get_players_details():
         player_id = concat(href.split("/")[3], "/")
         player_name = href.split("/")[4].split("?")[0]
         player_link = "https://www.hltv.org/player/" + concat(player_id, player_name)
+
+
+def get_players_details():
+
+    ''' returns list of dictionaries for all significant players stats '''
+
+    main_page = "https://www.hltv.org/stats/players?startDate=2024-09-10&endDate=2025-03-10"
+    content = get_website_content(main_page)
+
+    '''
+    from main page that contains all
+    players basic stats we catch link to each player hltv profile
+    '''
+
+    players_table = content.find("table", class_ = "stats-table player-ratings-table")
+    players_box = players_table.find_all("tr")
+
+    players_links = []
+
+    for player_box in players_box:
+        href = player_box.find("a").get("href")
+        player_id = concat(href.split("/")[3], "/")
+        player_name = href.split("/")[4].split("?")[0]
+        player_link = "https://www.hltv.org/player/" + concat(player_id, player_name)
+        players_links.append(player_link)
+
+
+    ''' 
+    once we have gained all the required links
+    we move on to opening each player link and pulling data
+    '''
+
+    players_details = []
+
+    for link in players_links:
+        player_box = get_website_content(link)
+        age = player_box.find("div", class_="playerInfoRow playerAge").find("span", class_= "listRight").find("span").get_text().split(" ")[0]
+        team = player_box.find("div", class_ = "playerInfoRow playerTeam").find("img").get("title")
+
+        attributes = player_box.find("div", class_ = "playerpage-container playerpage-container-attributes").find_all("div", "player-stat")
+        attr_val = []
+        attr_name = []
+        for attribute in attributes:
+            attribute_name = attribute.find("b").get_text()
+            attr_name.append(attribute_name)
+            attribute_value = attribute.find("span", class_ = "statsVal").find("p")
+
+            if attribute_value.find("b"):
+                attribute_value =  attribute_value.find("b").get_text()
+                attr_val.append(attribute_value)
+            else:
+                attribute_value = attribute_value.get_text().split("/")[0]
+                attr_val.append(attribute_value)
+
+
+        player_names = player_box.find("div", class_ = "playerName")
+        nick = player_names.find("h1").get_text()
+        real_name = player_names.find("div", class_ = "playerRealname").get_text()
+        id = link.split("/")[4]
+
+        players_details.append(
+            {
+                "id" : id,
+                "nick" : nick,
+                "realName" : real_name,
+                "age" : age,
+                "team" : team,
+                attr_name[0]: attr_val[0],
+                attr_name[1]: attr_val[1],
+                attr_name[2]: attr_val[2],
+                attr_name[3]: attr_val[3],
+                attr_name[4]: attr_val[4],
+                attr_name[5]: attr_val[5],
+                attr_name[6]: attr_val[6],
+                attr_name[7]: attr_val[7]
+            }
+        )
+
+    return players_details
