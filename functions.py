@@ -3,7 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 
-def get_website_content(url, con_type, _class, find_type):
+def get_website_content(url, con_type = "None", _class = "None", find_type = "None"):
 
     '''   from provided url scrapping all content  '''
 
@@ -172,10 +172,6 @@ def get_match(url):
     except IndexError:
         date = None
 
-
-
-
-
     type_ = content_overall.find("div", class_ = "padding preformatted-text").get_text().split("*")[0]
     type_ = type_.replace("\n\n", "")
     tournament_id = content_overall.find("div", class_="event text-ellipsis").find("a").get("href").split("/")[2]
@@ -239,3 +235,22 @@ def get_match(url):
     )
 
     return result
+
+
+def get_players_details():
+
+    '''     '''
+
+    all_players_link = "https://www.hltv.org/stats/players?startDate=2025-02-10&endDate=2025-03-10&maps=de_dust2&rankingFilter=Top5"
+    content = get_website_content(all_players_link)
+    
+    players_table = content.find("table", class_ = "stats-table player-ratings-table")
+    players_box = players_table.find_all("tr")
+
+    players_links = []
+
+    for player_box in players_box[2:3]:
+        href = player_box.find("a").get("href")
+        player_id = concat(href.split("/")[3], "/")
+        player_name = href.split("/")[4].split("?")[0]
+        player_link = "https://www.hltv.org/player/" + concat(player_id, player_name)
