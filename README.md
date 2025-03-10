@@ -27,4 +27,5 @@ In the world of esports, HLTV.org stands as the leading platform for tracking Co
 
 <img width="700" alt="relations" src="relations_2nd.png">
 
-The database includes six tables: matches, maps_stats, player_details, player_stats, teams and tournaments. The foreign key relationships are mostly one-to-many, such as one match having many maps stats, and one team having many players. These relationships can be visualized using dbdiagram.io
+  The database includes six tables: map, matches, player_performance, teams, player_details and tournaments. Many-to-one relationships: Since our priority table is a map table, we can pull some details about each map played, such as date, tournament, team bans. Relationships indicate that there can be more than one map for each match. One-to-one relationships refer to the map-player performance relationship, since for each map there is one map with detailed player performance.
+  Particulary interesting is relation (one to one) between player performance and player details because it allows you to combine each individual performance with their last 3 month
