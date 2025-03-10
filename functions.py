@@ -290,7 +290,11 @@ def get_players_details(link):
 
     player_box = get_website_content(link)
     age = player_box.find("div", class_="playerInfoRow playerAge").find("span", class_= "listRight").find("span").get_text().split(" ")[0]
-    team = player_box.find("div", class_ = "playerInfoRow playerTeam").find("img").get("title")
+
+    try:
+        team = player_box.find("div", class_ = "playerInfoRow playerTeam").find("img").get("title")
+    except AttributeError:
+        team = "NoTeam"
 
     attributes = player_box.find("div", class_ = "playerpage-container playerpage-container-attributes").find_all("div", "player-stat")
     attr_val = []
