@@ -245,3 +245,21 @@ def get_map(map_url, no):
 
     return maps_details
 
+
+
+def players_performance(map_url):
+
+    ''' players statistics for given map '''
+
+    content = get_website_content(map_url)
+    players_performance = []
+
+    map_id = map_url.split("/")[6]
+
+    content.find_all("table", class_ = "stats-table totalstats")
+
+
+
+
+    return  players_performance
+
