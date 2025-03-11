@@ -168,35 +168,80 @@ def get_players_played(match_url):
 
 
 
-def get_map_details(match_url):
+def get_map(map_url, no):
 
     '''  returns maps details for given match   '''
 
+    content = get_website_content(map_url)
     maps_details = []
 
     ''' overall statistics for map '''
-    most_kills = ""
-    most_damage = ""
-    most_assist = ""
-    most_awp_kills = ""
-    most_first_kills = ""
-    best_rating = ""
-    map_name = ""
-    teamA = ""
-    teamB = ""
 
-    ''' team A'''
-    final_score_tA = ""
-    fh_score_tA = ""
-    sh_score_tA = ""
-    first_kills_tA = ""
-    clutches_won_tA = ""
-    ''' team B'''
-    final_score_tB = ""
-    fh_score_tB = ""
-    sh_score_tB = ""
-    first_kills_tB = ""
-    clutches_won_tB = ""
+    id = map_url.split("/")[6]
+    match_id = content.find("a", class_ = "match-page-link button").get("href").split("/")[2]
+    names = content.find_all("div", class_="stats-match-map-result-mapname dynamic-map-name-full")
+    name = names[no].get_text()
+    teamA = content.find("div", class_="team-left").find("a", class_ = "block text-ellipsis").get_text()
+    teamB = content.find("div", class_="team-right").find("a", class_ = "block text-ellipsis").get_text()
+
+    ''' team A '''
+    final_score_tA = content.find("div", class_="team-left").find("div").get_text()
+    fh_score_tA = content.find("div", class_ = "match-info-row").find_all("span")[2].get_text()
+    sh_score_tA = content.find("div", class_ = "match-info-row").find_all("span")[4].get_text()
+
+    ''' team B '''
+    final_score_tB = content.find("div", class_="team-right").find("div").get_text()
+    fh_score_tB = content.find("div", class_ = "match-info-row").find_all("span")[3].get_text()
+    sh_score_tB = content.find("div", class_ = "match-info-row").find_all("span")[5].get_text()
+
+    ''' team A B'''
+
+    first_kills_tA, first_kills_tB = content.find_all("div", class_ = "match-info-row")[2].find("div", class_ = "right").get_text().split(":")
+    clutches_won_tA, clutches_won_tB = content.find_all("div", class_ = "match-info-row")[3].find("div", class_ = "right").get_text().split(":")
+
+    most_boxes = content.find_all("div", class_ = "most-x-box standard-box")
+
+    for most_box in most_boxes:
+        match most_box.find("span", class_ = "most-x-title").get_text():
+            case "Most kills":
+                most_kills = "-".join([most_box.find("a").get_text(), most_box.find("span", class_ = "valueName").get_text()])
+            case "Most damage":
+                most_damage = "-".join([most_box.find("a").get_text(), most_box.find("span", class_ = "valueName").get_text()])
+            case "Most assists":
+                most_assist = "-".join([most_box.find("a").get_text(), most_box.find("span", class_ = "valueName").get_text()])
+            case "Most AWP kills":
+                most_awp_kills = "-".join([most_box.find("a").get_text(), most_box.find("span", class_ = "valueName").get_text()])
+            case "Most first kills":
+                most_first_kills = "-".join([most_box.find("a").get_text(), most_box.find("span", class_ = "valueName").get_text()])
+            case "Best rating 2.1":
+                best_rating = "-".join([most_box.find("a").get_text(), most_box.find("span", class_ = "valueName").get_text()])
+            case "_":
+                break
+
+    maps_details.append({
+
+        "id" : id,
+        "match_id" : match_id,
+        "name": name,
+        "team A": teamA,
+        "team B": teamB,
+        "most kills" : most_kills,
+        "most damage" : most_damage,
+        "most assists" : most_assist,
+        "most awp kills" : most_awp_kills,
+        "most first kills" : most_awp_kills,
+        "best rating" : best_rating,
+        "final score team A" : final_score_tA,
+        "first half score A" : fh_score_tA,
+        "second half score A" : sh_score_tA,
+        "first kill team A" : first_kills_tA,
+        "clutches won team A" : clutches_won_tA,
+        "final score team B": final_score_tB,
+        "first half score B": fh_score_tB,
+        "second half score B": sh_score_tB,
+        "first kill team B": first_kills_tB,
+        "clutches won team B": clutches_won_tB
+    })
 
     return maps_details
 
