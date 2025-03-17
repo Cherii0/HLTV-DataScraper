@@ -1,5 +1,8 @@
+import random
+
 from funtions import get_website_content
 from operator import concat
+from functools import reduce
 
 
 def get_match(url):
@@ -67,8 +70,9 @@ def get_match(url):
 
         bans_teamB.pop() # removes left map
 
-        bans_teamB = ",".join([ban.split(" ")[-1] for ban in bans_teamB])
-        bans_teamA = ",".join([ban.split(" ")[-1] for ban in bans_teamA])
+        bans_teamB = reduce(lambda bans, map :  bans.split(" ")[-1] + "," + map.split(" ")[-1], bans_teamB)
+        bans_teamA = reduce(lambda bans, map :  bans.split(" ")[-1] + "," + map.split(" ")[-1], bans_teamA)
+        print(bans_teamB)
 
     try:
         mvp = content_overall.find("div", class_ = "highlighted-player potm-container").find("span", class_="player-nick").get_text()
@@ -132,7 +136,14 @@ def get_maps_scores(match_url):
 
 def get_players_played(match_url):
 
-    '''  gets player nick, kd, adr for each player played given match   '''
+    '''
+    gets player nick, kd, adr for each player played given match
+
+    Args : match_url (string)
+
+    Returns : result_set (list of dictionaries)
+
+    '''
 
     # gets table stats
     content_overall = get_website_content(match_url, "div", "stats-content", "single")
@@ -246,7 +257,6 @@ def get_map(map_url, no):
     return maps_details
 
 
-
 def players_performance(map_url):
 
     ''' players statistics for given map '''
@@ -262,4 +272,5 @@ def players_performance(map_url):
 
 
     return  players_performance
+
 
