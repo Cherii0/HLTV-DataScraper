@@ -6,7 +6,7 @@ from operator import concat
 class Driver:
     time_to_load_page = 2
 
-    def get_url_content(self, url, con_type = "", class_type = "", find_type = None):
+    def get_url_content(self, url, _con = "", _class = "", find_type = None):
 
         '''
 
@@ -26,21 +26,30 @@ class Driver:
         driver.quit()
 
         if find_type == "multi":
-            return soup.find_all(con_type, class_=_class)
+            return soup.find_all(_con, class_=_class)
         elif find_type == "single":
-            return soup.find(con_type, class_=_class)
+            return soup.find(_con, class_=_class)
         return soup
 
 
 
 
 class Scrapper(Driver):
+    teams_ranking_url = "https://www.hltv.org/ranking/teams/2025/march/17"
+
 
     def __init__(self):
         self.teams_urls = []
 
     def __str__(self):
         return "Scrapper object"
+
+
+    ''' update attributes'''
+
+    def update_teams_ranking_url(self, url):
+        self.teams_ranking_url = url
+
 
     ''' adding urls '''
 
@@ -59,6 +68,12 @@ class Scrapper(Driver):
             return f"{team} no found"
 
     ''' scrapping  '''
+
+    def  retrieve_teams_urls(self):
+
+        teams_boxes = self.get_url_content(self.teams_ranking_url, "div", "lineup-con", "multi")
+        for team_box in teams_boxes:
+            self.teams_urls.append(concat("https://www.hltv.org", team_box.find("a", class_ = "moreLink")["href"]))
 
     def get_team_info(self, team_name):
 
@@ -133,5 +148,5 @@ class Scrapper(Driver):
 
 
 scraper = Scrapper()
-scraper.add_team_url("spirit", "https://www.hltv.org/team/7020/spirit")
-print(scraper.get_team_info("spirit"))
+scraper.retrieve_teams_urls()
+print(scraper.teams_urls)
