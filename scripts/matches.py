@@ -9,13 +9,13 @@ class MatchesResults:
     def __init__(self):
         Driver()
         FileManager()
-        self.url_manager = UrlManager()
+        UrlManager()
         self.con_type = "div"
         self.con_class = "result-con"
         self.soup = None
         self.collected_elements = []
         self.matches_links = []
-        # main collections for pulled data
+            # collections for pulled data
         self.matches_details_d = dict()
         self.matches_details_l = list()
 
@@ -48,18 +48,21 @@ class MatchesResults:
         self.matches_links.clear()
         for page in range(1, self.pages+1):
             if page == 1:
-                self.soup = Driver.get_content(self.url_manager.links_dict.get("results"))
+                self.soup = Driver.get_content(UrlManager.links_dict.links_dict.get("results"))
             else:
                 offset = 100 * self.pages
-                self.soup = Driver.get_content(self.url_manager.links_dict.get("results") + self.offset_str + str(offset))
+                self.soup = Driver.get_content(UrlManager.links_dict.links_dict.get("results") + self.offset_str + str(offset))
 
             # 100 bins each contains link to extract
             self.collected_elements.extend(self.soup.find_all(self.con_type, class_=self.con_class))
             self.extract_links()
 
-    def extract_links(self):
+    def extract_links(self) -> None:
+        """""
+        replace each collected element with extracted link within self.collected_elements
+        """""
         for match in self.collected_elements:
-            main_part = self.url_manager.links_dict["main"]
+            main_part = UrlManager.links_dict["main"]
             match_part = match.find("a", class_="a-reset").get("href")
             link = concat(main_part, match_part)
             self.matches_links.append(link)
@@ -200,5 +203,10 @@ class MatchesResults:
         print(f"last 5 matches in database : \n {self.matches_links[-5:]}")
         print(f"random match details : \n match id :{self.matches_details_l[-1]}")
 
-    def write_to_txt_file(self) -> None:
+    def write_to_csv_file(self) -> None:
         FileManager.write_to_txt_file(file_path=self.file_path, data=self.matches_details_l)
+
+    def write_to_json_file(self) -> None:
+        FileManager.write_to_json_file(file_path=self.file_path, data=self.matches_details_d)
+
+
