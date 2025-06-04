@@ -1,62 +1,35 @@
+from unittest import result
+
 from matches import MatchesResults
 from players import Players
 from teams import Teams
+from menu_manager import Menu
 
-class Menu:
-
-    @staticmethod
-    def show_menu():
-        # matches
-        print("1. Scratch matches results")
-        print("2. Describe matches results")
-        print("3. Save matches results into csv")
-        print("4. Save matches results into json")
-        # players
-        print("5. Scratch players database")
-        print("6. Describe players")
-        print("7. Save players databases into csv")
-        print("8. Save players database into json")
-        # teams
-        print("9. Scratch ranked teams")
-        print("10. Describe teams")
-        print("11. Save ranked teams into csv")
-        print("12. Save ranked teams into json")
-
-
-
-class ScrapperManager:
+class Scrapper:
     def __init__(self):
             # subScrappers objects
         self.matches_results = MatchesResults()
-        self.players = Players()
         self.teams = Teams()
-
-            # scrappers functions collector
-        self.funcs = self.make_funcs()
-        self.menu_options_num = len(self.funcs)
-            # menu object for printing menu content
+        self.players = Players()
+            # menu object for printing menu content and executing Scrapper methods
         self.menu = Menu()
+            # collector for funcs
+        self.funcs = None
+        self.collect_funcs()
 
-    def make_funcs(self) -> dict:
-        return {
-            1. : self.matches_results.scratch,
-            2. : self.matches_results.describe,
-            3  : self.matches_results.write_to_csv_file,
-            4  : self.matches_results.write_to_json_file,
-            5. : self.players.scratch,
-            6. : self.players.describe,
-            7  : self.players.write_to_csv_file,
-            8  : self.players.write_to_json_file,
-            9. : self.teams.scratch,
-            10. : self.teams.describe,
-            11  : self.teams.write_to_csv_file,
-            12  : self.teams.write_to_json_file,
-        }
+    def collect_funcs(self):
+        self.funcs = {1 : {1 : self.matches_results.scrap, 2 : self.matches_results.describe,
+                           3 : self.matches_results.write_to_csv_file, 4 : self.matches_results.write_to_json_file},
+                      2 : {1 : self.teams.scrap, 2 : self.teams.describe,
+                           3 : self.teams.write_to_csv_file, 4 : self.teams.write_to_json_file},
+                      3 : {1 : self.players.scrap, 2 : self.players.describe,
+                           3 : self.players.write_to_csv_file, 4 : self.players.write_to_json_file}
+                      }
 
     def execute(self) -> None:
-        self.menu.show_menu()
+        self.menu.show_main_menu()
+        tab = int(input("Your choice... "))
         while True:
-            choice = int(input("Your choice... "))
-            if not 0 < choice <= self.menu_options_num:
-                break
-            self.funcs.get(choice)()
+            self.menu.show(tab)
+            operation = int(input("Your choice... "))
+            self.funcs[tab][operation]()
